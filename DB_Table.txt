@@ -1,0 +1,35 @@
+1. Table USer
+    Fill Name       Fill Type
+    - name          string
+    - email         string
+    - password      string
+
+2.  Table Store
+    Fill Name       Fill Type
+    - name          string
+    - image         string
+    - amount        integer
+    - price_buy     integer
+    - price_sell    integer
+
+3.  Table Transection
+    Fill Name       Fill Type
+    - tran_id       string
+    - product_id    string
+    - tran_type     string
+    - amount        integer
+    - price         integer
+    - tran_detail   string
+
+4. Table Bill 
+    Fill Name       Fill Type
+    - bill_id       string
+    - customer_name string
+    - customer_tel  string
+
+5. Table Bill_list
+    Fill Name       Fill Type
+    - bill_id       string
+    - name          string
+    - amount        integer
+    - price         integer
