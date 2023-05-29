@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('bill_id');
             $table->string('name');
             $table->integer('amount');
-            $table->intrger('price');
+            $table->integer('price');
             $table->timestamps();
         });
     }

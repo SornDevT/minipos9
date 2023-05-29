@@ -5,9 +5,14 @@
 </template>
 
 <script>
+import { useStore } from '../store/auth'
+
 export default {
     name: 'Minipos9Report',
-
+    setup(){
+        const store = useStore()
+        return {store}
+    },
     data() {
         return {
             
@@ -21,6 +26,9 @@ export default {
     methods: {
         
     },
+    created(){
+        console.log(useStore().get_data);
+    }
 };
 </script>
 
