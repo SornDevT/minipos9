@@ -57,6 +57,9 @@
 </template>
 
 <script>
+
+import axios from 'axios';
+
 export default {
     name: 'Minipos9Register',
 
@@ -78,21 +81,59 @@ export default {
     methods: {
         register(){
 
-            if(this.name == '' || this.email == '' || this.password == '' || this.password2 ==''){
+            if(this.name == '' || this.email == '' || this.password == '' || this.password2 ==''){ // ກວດການປ້ອນຂໍ້ມູນ
                 this.show_error = true
                 this.text_error = 'ກະລຸນາປ້ອນຂໍ້ມູນໃຫ້ຄົບຖ້ວນ!'
             } else {
                 
+              if(this.password.length>5){ //ກວດລະຫັດຜ່ານ ຕ້ອງຫຼາວກ່ວາ 5 ຕົວອັກສອນ
 
-                if(this.password == this.password2){
-                    this.show_error = false
-                    this.text_error = ''
+                  if(this.password == this.password2){  // ກວດລະຫັດຜ່ານ ຕ້ອງກົງກັນ
+                      this.show_error = false
+                      this.text_error = ''
+
+                      axios.post("register",{
+                        name: this.name,
+                        email: this.email,
+                        password: this.password
+                      }).then((response)=>{
+                        console.log(response.data)
+
+                        if(response.data.success){
+
+                          this.show_error = false
+                          this.text_error = ''
+                          // ເຄຼຍຂໍ້ມູນໃນຟອມ
+                          this.name = ''
+                          this.email = ''
+                          this.password = ''
+                          this.password2 = ''
+
+                          this.$router.push("/login")
 
 
-                } else {
-                    this.show_error = true
-                    this.text_error = 'ລະຫັດຜ່ານບໍ່ກົງກັນ!'
-                }
+                        } else {
+
+                          this.show_error = true
+                          this.text_error = response.data.message
+                        }
+
+                      }).catch((error)=>{
+                        console.log(error);
+                      })
+
+
+                  } else {
+                      this.show_error = true
+                      this.text_error = 'ລະຫັດຜ່ານບໍ່ກົງກັນ!'
+                  }
+
+              } else{
+                this.show_error = true
+                this.text_error = 'ລະຫັດຜ່ານຕ້ອງຫຼາຍກ່ວາ 5 ຕົວອັກສອນ!'
+              }
+
+                
             }
 
         }

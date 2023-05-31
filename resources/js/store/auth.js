@@ -10,6 +10,9 @@ export const useStore = defineStore('auth',{
         get_data:(state) => state.test,
     },
     actions:{
+        remove_token(){
+            this.token = null
+        },
         set_token(token_new){
             this.token = token_new
         },

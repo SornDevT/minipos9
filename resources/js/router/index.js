@@ -37,6 +37,11 @@ export const routes = [
         component: Register
     },
     {
+        path: "/",
+        redirect:"/store"
+
+    },
+    {
         name:"store",
         path: "/store",
         component: Store,
@@ -91,7 +96,8 @@ router.beforeEach((to, from, next)=>{
     if(to.meta.middleware){
        to.meta.middleware.forEach(middleware => middleware(to, from, next))
     }else{
-        if(to.path=="/login" || to.path=="/"){
+        //if(to.path=="/login" || to.path=="/" || to.path=="/register"){
+        if(to.path=="/login" || to.path=="/" ){
             if(token){
                 next({
                     path:"/store",

@@ -116,9 +116,9 @@
                 <div class="dropdown-divider"></div>
               </li>
               <li>
-                <a class="dropdown-item" href="auth-login-basic-1.html">
+                <a class="dropdown-item" href="javascript:void(0);" @click="logout()">
                   <i class="bx bx-power-off me-2"></i>
-                  <span class="align-middle">Log Out</span>
+                  <span class="align-middle">ອອກຈາກລະບົບ</span>
                 </a>
               </li>
             </ul>
@@ -203,7 +203,8 @@
 <script>
 
 import { useStore } from './store/auth'
-
+import axios
+ from 'axios';
 export default {
     name: 'Minipos9App',
 
@@ -223,7 +224,20 @@ export default {
     },
 
     methods: {
-        
+      async logout(){
+
+        const store = useStore()
+        const token = store.get_token
+        const response = await axios.post("logout",{},{ headers:{ Authorization: 'Bearer '+ token}});
+        console.log(response.status);
+        if(response.status == 200){
+          store.remove_token();
+          localStorage.removeItem('web_token');
+          localStorage.removeItem('web_user');
+          this.$router.push("/login")
+        }
+  
+      }
     },
 };
 </script>
