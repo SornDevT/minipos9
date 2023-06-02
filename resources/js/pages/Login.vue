@@ -91,6 +91,8 @@ export default {
 
                           localStorage.setItem('web_token',response.data.authorisation.token)
                           localStorage.setItem('web_user', JSON.stringify(response.data.user))
+                     
+
                           this.$router.push('/store')
 
                           this.show_error = false

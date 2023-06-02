@@ -12,9 +12,13 @@ import { useStore } from "../store/auth";
 
 const authMiddleware = (to, from, next) => {
     const token = localStorage.getItem('web_token')
-    console.log(token);
+    const user = localStorage.getItem('web_user')
+    //  console.log(user);
+
     const store = useStore()
     store.set_token(token)
+    store.set_user(user)
+
     if(!token){
         next({
             path:"/login",

@@ -82,8 +82,8 @@
                       </div>
                     </div>
                     <div class="flex-grow-1">
-                      <span class="fw-semibold d-block">John Doe</span>
-                      <small class="text-muted">Admin</small>
+                      <span class="fw-semibold d-block"> {{ JSON.parse(store.get_user).name }} </span>
+                      <small class="text-muted">{{ JSON.parse(store.get_user).email }}</small>
                     </div>
                   </div>
                 </a>
@@ -229,7 +229,7 @@ export default {
         const store = useStore()
         const token = store.get_token
         const response = await axios.post("logout",{},{ headers:{ Authorization: 'Bearer '+ token}});
-        console.log(response.status);
+        // console.log(response.status);
         if(response.status == 200){
           store.remove_token();
           localStorage.removeItem('web_token');
@@ -239,6 +239,9 @@ export default {
   
       }
     },
+    created(){
+      // console.log(useStore().get_user);
+    }
 };
 </script>
 
