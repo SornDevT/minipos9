@@ -17,16 +17,19 @@ class StoreController extends Controller
     public function index(){
          try{
 
-        return "Test Data get back!";
+                $search = \Request::get("search");
+                $sort = \Request::get("sort");
+                $lp = \Request::get("lp");
 
-                $user = new Store();
-                $user->name = $request->name;
-                $user->email = $request->email;
-                $user->password = hash::make($request->password);
-                $user->save();
+                $store = Store::orderBy("id",$sort)
+                ->where("name","LIKE","%{$search}%")
+                ->paginate($lp)
+                ->toArray();
+
+                return array_reverse($store);
 
                 $success = true;
-                $message = "ບັນທຶກຂໍ້ມູນສຳເລັດ!";
+                $message = "ສຳເລັດ!";
 
         } catch (\Illuminate\Database\QueryException $ex){
             $success = false;
@@ -39,5 +42,35 @@ class StoreController extends Controller
         ];
 
         return response()->json($response);
+    }
+
+
+    public function add(Request $request){
+        try{
+
+    
+                    $store = new Store([
+                        'name' => $request->name,
+                        'image' => '',
+                        'amount' => $request->amount,
+                        'price_buy' => $request->price_buy,
+                        'price_sell' => $request->price_sell,
+                    ]);
+                    $store->save();
+    
+                    $success = true;
+                    $message = "ບັນທຶກຂໍ້ມູນສຳເລັດ!";
+    
+            } catch (\Illuminate\Database\QueryException $ex){
+                $success = false;
+                $message = $ex->getMessage();
+            }
+    
+            $response = [
+                "success" => $success,
+                "message" => $message
+            ];
+    
+            return response()->json($response);
     }
 }

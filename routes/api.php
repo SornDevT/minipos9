@@ -29,7 +29,7 @@ Route::post("logout",[UserController::class,"logout"]);
 Route::controller(StoreController::class)->group(function (){
     Route::get('store','index');
     Route::get('store/edit/{id}','edit');
-    Route::get('store/add','add');
+    Route::post('store/add','add');
     Route::post('store/update/{id}','update');
     Route::delete('store/delete/{id}','delete');
 });
