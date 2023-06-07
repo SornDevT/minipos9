@@ -1,17 +1,24 @@
-import './bootstrap';
+import './bootstrap'
 
-import { createApp } from 'vue';
-import router from './router';
-import App from './App.vue';
-import Menu from './components/Menu.vue';
+import { createApp } from 'vue'
+import router from './router'
+import App from './App.vue'
+import Menu from './components/Menu.vue'
 import Pagination from './components/Pagination.vue'
-import './service/axios';
+import './service/axios'
 
-import { createPinia } from 'pinia';
-const pinia = createPinia();
+import VueSweetalert2 from 'vue-sweetalert2'
+import 'sweetalert2/dist/sweetalert2.min.css'
+
+import Cleave from 'vue-cleave-component'
+
+import { createPinia } from 'pinia'
+const pinia = createPinia()
 
 
 const app = createApp(App)
+app.use(VueSweetalert2)
+app.use(Cleave)
 app.use(router)
 app.use(pinia)
 app.component("SildeBarMenu",Menu)

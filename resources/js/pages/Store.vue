@@ -27,16 +27,16 @@
                             <label for="product-name" class="form-label fs-6">ຊື່ສິນຄ້າ: <span class="text-danger">*</span> </label>
                             <input type="text" class="form-control mb-2" id="product-name" placeholder="...." v-model="FormStore.name">
                             <label for="product-name" class="form-label fs-6">ຈຳນວນ:  <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control  mb-2" id="product-name" placeholder="...." v-model="FormStore.amount">
+                            <cleave :options="options" class="form-control  mb-2" id="product-name" placeholder="...." v-model="FormStore.amount" />
 
                             <div class="row">
                                 <div class="col-md-6">
                                     <label for="product-name" class="form-label fs-6  mb-2">ລາຄາຊື້: <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="product-name" placeholder="...." v-model="FormStore.price_buy">
+                            <cleave :options="options" class="form-control" id="product-name" placeholder="...." v-model="FormStore.price_buy" />
                                 </div>
                                 <div class="col-md-6">
                                     <label for="product-name" class="form-label fs-6  mb-2">ລາຄາຂາຍ: <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="product-name" placeholder="...." v-model="FormStore.price_sell">
+                                    <cleave :options="options" class="form-control" id="product-name" placeholder="...." v-model="FormStore.price_sell" />
                                 </div>
                             </div>
                     
@@ -47,6 +47,7 @@
 
   
     <!-- {{ StoreData }} -->
+    <!-- <button @click="showAlert">Hello world</button> -->
     <div class="table-responsive text-nowrap" v-if="!ShowForm" >
       
         <div class=" d-flex justify-content-between mb-2">
@@ -84,13 +85,14 @@
             <td> {{ list.id  }} </td>
             <td> {{ list.image }}</td>
             <td> {{ list.name  }} </td>
-            <td> {{ list.price_buy }}</td>
+            <td> {{ formatPrice(list.price_buy) }}</td>
             <td>
               <div class="dropdown">
                 <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-edit-alt me-1"></i> Edit</a>
-                  <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-trash me-1"></i> Delete</a>
+                  <a class="dropdown-item" href="javascript:void(0);" @click="CopyStore(list.id)"><i class='bx bx-copy-alt me-1' ></i> ກ໊ອບປີ້</a>
+                  <a class="dropdown-item" href="javascript:void(0);" @click="EditStore(list.id)"><i class="bx bx-edit-alt me-1"></i> ແກ້ໄຂ</a>
+                  <a class="dropdown-item" href="javascript:void(0);" @click="DeleteStore(list.id)"><i class="bx bx-trash me-1"></i> ລຶບ</a>
                 </div>
               </div>
             </td>
@@ -110,7 +112,6 @@ import axios from 'axios';
 
 export default {
     name: 'Minipos9Store',
-
     setup(){
         const store = useStore()
         return {store}
@@ -133,6 +134,17 @@ export default {
             search:'',
             list_page:10,
             sort:'asc',  // asc = ລຽງແຕ່ນ້ອຍ, desc = ລຽງແຕ່ໃຫຍ່ຫານ້ອຍ
+            options: {
+                  // prefix: '₭ ',
+                  numeral: true,
+                  numeralPositiveOnly: true,
+                  noImmediatePrefix: true,
+                  rawValueTrimPrefix: true,
+                  numeralIntegerScale: 10,
+                  numeralDecimalScale: 2,
+                  numeralDecimalMark: ',',
+                  delimiter: '.'
+                }
         };
     },
 
@@ -163,6 +175,14 @@ export default {
     },
 
     methods: {
+      showAlert() {
+      // Use sweetalert2
+      this.$swal('Hello Vue world!!!');
+    },
+    formatPrice(value) {
+        let val = (value / 1).toFixed(0).replace(",", ".");
+        return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      },
       ChangeSort(){
           if(this.sort=='asc'){
             this.sort = 'desc'
@@ -182,8 +202,112 @@ export default {
         CancelStore(){
             this.ShowForm = false
         },
-        EditStore(id){
+       async EditStore(id){
           this.EditID = id
+          this.FormType = false
+
+          await axios.get(`store/edit/${id}`,{ headers:{ Authorization: 'Bearer '+ this.store.get_token}}).then((response)=>{
+         
+                          this.ShowForm = true
+                          this.FormStore = response.data
+
+                      }).catch((error)=>{
+                        this.loading_post = false
+                        console.log(error);
+                        // ກວດເຊັກຫາກບໍ່ມີການ ເຂົ້າສູ່ລະບົບ ໃຫ້ໄປໜ້າເຂົ້າສູ່ລະບົບ
+                        if(error){
+                            if(error.response.status == 401){
+                                useStore().remove_token()
+                                useStore().remove_user()
+                                localStorage.removeItem('web_token')
+                                localStorage.removeItem('web_user')
+                                this.$router.push("/login")
+                            }
+                        }
+
+                      })
+
+        },
+       async CopyStore(id){
+          this.EditID = id
+          this.FormType = true
+
+          await axios.get(`store/edit/${id}`,{ headers:{ Authorization: 'Bearer '+ this.store.get_token}}).then((response)=>{
+         
+                          this.ShowForm = true
+                          this.FormStore = response.data
+
+                      }).catch((error)=>{
+                        this.loading_post = false
+                        console.log(error);
+                        // ກວດເຊັກຫາກບໍ່ມີການ ເຂົ້າສູ່ລະບົບ ໃຫ້ໄປໜ້າເຂົ້າສູ່ລະບົບ
+                        if(error){
+                            if(error.response.status == 401){
+                                useStore().remove_token()
+                                useStore().remove_user()
+                                localStorage.removeItem('web_token')
+                                localStorage.removeItem('web_user')
+                                this.$router.push("/login")
+                            }
+                        }
+
+                      })
+        },
+        DeleteStore(id){
+
+
+
+          this.$swal({
+            title: 'ທ່ານແນ່ໃຈບໍ່?',
+            text: "ທີ່ຈະລຶບຂໍ້ມູນນີ້!",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'ຕົກລົງລຶບ!',
+            cancelButtonText: 'ຍົກເລີກ'
+          }).then((result) => {
+            if (result.isConfirmed) {
+
+                // this.loading_post = true
+                axios.delete(`store/delete/${id}`,{ headers:{ Authorization: 'Bearer '+ this.store.get_token}}).then((response)=>{
+                  // this.loading_post = false
+
+                    if(response.data.success){
+                      this.GetAllStore()
+
+                      this.$swal('ສຳເລັດ!',response.data.message,'success')
+
+                    } else {
+                      this.$swal('ຜິດຜາດ!',response.data.message,'error')
+                    }
+
+
+                }).catch((error)=>{
+                  // this.loading_post = false
+                  console.log(error);
+                  // ກວດເຊັກຫາກບໍ່ມີການ ເຂົ້າສູ່ລະບົບ ໃຫ້ໄປໜ້າເຂົ້າສູ່ລະບົບ
+                  if(error){
+                      if(error.response.status == 401){
+                          useStore().remove_token()
+                          useStore().remove_user()
+                          localStorage.removeItem('web_token')
+                          localStorage.removeItem('web_user')
+                          this.$router.push("/login")
+                      }
+                  }
+
+                })
+
+
+
+
+             
+
+            }
+          })
+
+          
 
         },
        async SaveStore(){
@@ -195,12 +319,31 @@ export default {
                 /// ເພີ່ມຂໍ້ມູນໃໝ່
                 await axios.post("store/add",this.FormStore,{ headers:{ Authorization: 'Bearer '+ this.store.get_token}}).then((response)=>{
                   this.loading_post = false
+                 
+
                         if(response.data.success){
                           this.ShowForm = false
                           this.GetAllStore()
 
-                        } else {
+                          this.$swal({
+                            toast:true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: response.data.message,
+                            showConfirmButton: false,
+                            timer: 2500
+                          })
 
+                        } else {
+                          this.$swal({
+                            // toast:true,
+                            position: 'center',
+                            icon: 'error',
+                            title: 'ຜິດຜາດ!',
+                            text: response.data.message,
+                            showConfirmButton: false,
+                            timer: 4500
+                          })
                         }
 
                       }).catch((error)=>{
@@ -222,6 +365,50 @@ export default {
 
               } else {
                 // ອັບເດດຂໍ້ມູນ
+
+                await axios.post(`store/update/${this.EditID}`,this.FormStore,{ headers:{ Authorization: 'Bearer '+ this.store.get_token}}).then((response)=>{
+                  this.loading_post = false
+
+                  if(response.data.success){
+                          this.ShowForm = false
+                          this.GetAllStore()
+
+                          this.$swal({
+                            toast:true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: response.data.message,
+                            showConfirmButton: false,
+                            timer: 2500
+                          })
+
+                        } else {
+                          this.$swal({
+                            // toast:true,
+                            position: 'center',
+                            icon: 'error',
+                            title: 'ຜິດຜາດ!',
+                            text: response.data.message,
+                            showConfirmButton: false,
+                            timer: 4500
+                          })
+                        }
+
+                      }).catch((error)=>{
+                        this.loading_post = false
+                        console.log(error);
+                        // ກວດເຊັກຫາກບໍ່ມີການ ເຂົ້າສູ່ລະບົບ ໃຫ້ໄປໜ້າເຂົ້າສູ່ລະບົບ
+                        if(error){
+                            if(error.response.status == 401){
+                                useStore().remove_token()
+                                useStore().remove_user()
+                                localStorage.removeItem('web_token')
+                                localStorage.removeItem('web_user')
+                                this.$router.push("/login")
+                            }
+                        }
+
+                      })
 
               }
           }

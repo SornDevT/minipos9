@@ -48,7 +48,6 @@ class StoreController extends Controller
     public function add(Request $request){
         try{
 
-    
                     $store = new Store([
                         'name' => $request->name,
                         'image' => '',
@@ -64,6 +63,7 @@ class StoreController extends Controller
             } catch (\Illuminate\Database\QueryException $ex){
                 $success = false;
                 $message = $ex->getMessage();
+                // $message = "ການບັນທຶກຂໍ້ມູນບໍ່ສຳເລັດ! ກະລຸນາຕິດຕໍ່ Admin!";
             }
     
             $response = [
@@ -72,5 +72,82 @@ class StoreController extends Controller
             ];
     
             return response()->json($response);
+    }
+
+    public function edit($id){
+
+        //ແບບງ່າຍ
+        $store = Store::find($id);
+        return $store;
+
+        // try{
+
+        //     $store = Store::find($id);
+
+        //     $success = true;
+        //     $message = "ດຶງຂໍ້ມູນສຳເລັດ!";
+
+        // } catch (\Illuminate\Database\QueryException $ex){
+        //     $success = false;
+        //     $message = $ex->getMessage();
+        //     $store = null;
+        // }
+
+        // $response = [
+        //     "store" => $store,
+        //     "success" => $success,
+        //     "message" => $message
+        // ];
+        // return response()->json($response);
+    }
+    public function update($id,Request $request){
+
+            try{
+
+            $store = Store::find($id);
+            $store->update([
+                "name"=>$request->name,
+                "image"=>'',
+                "amount"=>$request->amount,
+                "price_buy"=>$request->price_buy,
+                "price_sell"=>$request->price_sell,
+            ]);
+
+            $success = true;
+            $message = "ອັບເດດຂໍ້ມູນ ສຳເລັດ!";
+
+        } catch (\Illuminate\Database\QueryException $ex){
+            $success = false;
+            $message = $ex->getMessage();
+        }
+
+        $response = [
+            "success" => $success,
+            "message" => $message
+        ];
+        return response()->json($response);
+
+    }
+
+    public function delete($id){
+        try{
+
+            $store = Store::find($id);
+            $store->delete();
+
+            $success = true;
+            $message = "ລຶບຂໍ້ມູນ ສຳເລັດ!";
+            // $message = "ລຶບຂໍ້ມູນ ບໍ່ສຳເລັດ!";
+
+        } catch (\Illuminate\Database\QueryException $ex){
+            $success = false;
+            $message = $ex->getMessage();
+        }
+
+        $response = [
+            "success" => $success,
+            "message" => $message
+        ];
+        return response()->json($response);
     }
 }
