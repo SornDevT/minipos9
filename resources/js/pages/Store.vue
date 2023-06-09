@@ -21,7 +21,14 @@
                 </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4">ອັບໂຫຼດຮູບພາບ</div>
+                    <div class="col-md-4 text-center" style="position: relative;">
+                      <button type="button" class="btn rounded-pill btn-icon btn-danger box-del" v-if="FormStore.image" @click="CleanImg()">
+                        <i class='bx bxs-x-circle fs-4'></i>
+                      </button>
+                      <img :src="image_pre" class=" rounded cursor-pointer" @click="$refs.img_store.click()" style="width:80%" alt="">
+
+                      <input type="file" class=" form-control mt-2" ref="img_store" @change="onSelected" style="display: none;">
+                    </div>
                     <div class="col-md-8">
                     
                             <label for="product-name" class="form-label fs-6">ຊື່ສິນຄ້າ: <span class="text-danger">*</span> </label>
@@ -74,7 +81,7 @@
         <thead>
           <tr>
             <th>ID</th>
-            <th>ຮູບ</th>
+            <th width="120">ຮູບ</th>
             <th>ຊື່ສິນຄ້າ</th>
             <th>ລາຄາຊື້</th>
             <th>ຈັດການ</th>
@@ -83,7 +90,9 @@
         <tbody>
           <tr v-for="list in StoreData.data" :key="list.id">
             <td> {{ list.id  }} </td>
-            <td> {{ list.image }}</td>
+            <td> <img :src="'/assets/img/'+list.image" class="w-100 rounded" alt="" v-if="list.image"> 
+               <img src="/assets/img/add-img.png" class="w-100 rounded" alt="" v-else>
+               </td>
             <td> {{ list.name  }} </td>
             <td> {{ formatPrice(list.price_buy) }}</td>
             <td>
@@ -144,7 +153,8 @@ export default {
                   numeralDecimalScale: 2,
                   numeralDecimalMark: ',',
                   delimiter: '.'
-                }
+                },
+          image_pre: window.location.origin+'/assets/img/add-img.png'
         };
     },
 
@@ -175,6 +185,20 @@ export default {
     },
 
     methods: {
+      CleanImg(){
+        this.FormStore.image = ''
+        this.image_pre = window.location.origin+'/assets/img/add-img.png'
+      },
+      onSelected(event){
+        // console.log(event);
+        this.FormStore.image = event.target.files[0]
+        let reader = new FileReader();
+        reader.readAsDataURL(this.FormStore.image);
+        reader.addEventListener("load", function(){
+          this.image_pre = reader.result;
+        }.bind(this),false);
+
+      },
       showAlert() {
       // Use sweetalert2
       this.$swal('Hello Vue world!!!');
@@ -210,6 +234,12 @@ export default {
          
                           this.ShowForm = true
                           this.FormStore = response.data
+                          if(response.data.image){
+                            this.image_pre = window.location.origin + '/assets/img/'+response.data.image
+                          } else {
+                            this.image_pre = window.location.origin+'/assets/img/add-img.png'
+                          }
+                          console.log(this.FormStore);
 
                       }).catch((error)=>{
                         this.loading_post = false
@@ -317,7 +347,7 @@ export default {
           if(this.CheckForm){
               if(this.FormType){
                 /// ເພີ່ມຂໍ້ມູນໃໝ່
-                await axios.post("store/add",this.FormStore,{ headers:{ Authorization: 'Bearer '+ this.store.get_token}}).then((response)=>{
+                await axios.post("store/add",this.FormStore,{ headers:{ "content-type":"multipart/form-data", Authorization: 'Bearer '+ this.store.get_token}}).then((response)=>{
                   this.loading_post = false
                  
 
@@ -366,7 +396,7 @@ export default {
               } else {
                 // ອັບເດດຂໍ້ມູນ
 
-                await axios.post(`store/update/${this.EditID}`,this.FormStore,{ headers:{ Authorization: 'Bearer '+ this.store.get_token}}).then((response)=>{
+                await axios.post(`store/update/${this.EditID}`,this.FormStore,{ headers:{ "content-type":"multipart/form-data", Authorization: 'Bearer '+ this.store.get_token}}).then((response)=>{
                   this.loading_post = false
 
                   if(response.data.success){
@@ -449,6 +479,10 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-
+<style scoped>
+  .box-del{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+  }
 </style>
