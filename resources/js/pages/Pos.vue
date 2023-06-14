@@ -33,10 +33,10 @@
             <div class="card" style="height: 82vh; overflow: auto;">
                 <div class="card-body">
                     <label for="text-customer">ຊື້ລູກຄ້າ:</label>
-                    <input type="text" id="text-customer" class="form-control mb-2" placeholder="....">
+                    <input type="text" id="text-customer" class="form-control mb-2" v-model="customer_name" placeholder="....">
 
                     <label for="text-customer">ເບີໂທ:</label>
-                    <input type="text" id="text-customer" class="form-control" placeholder="....">
+                    <input type="text" id="text-customer" class="form-control" v-model="customer_tel" placeholder="....">
                     <hr>
                     <div class=" d-flex justify-content-between fs-4 text-info fw-bold">
                         <span>ລວມຍອດເງິນ:</span>
@@ -135,7 +135,14 @@
                   </div>
                 </div>
                 <div class="text-center mt-4">
-                    <button type="button" class="btn rounded-pill btn-success" :disabled="!(CashAmount>=TotalAmount)" @click="Pay()">ຍືນຍັນຊຳລະເງິນ</button>
+                    <button type="button" class="btn rounded-pill btn-success" :disabled="!(CashAmount>=TotalAmount)" @click="Pay()">
+                        <span v-if="loading_post">
+                          <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                        ກຳລັງໂຫຼດ...
+                    </span>
+                    <span v-else> ຍືນຍັນຊຳລະເງິນ</span>
+                       
+                    </button>
                 </div>
                   
                 </div>
@@ -174,6 +181,9 @@ export default {
                   numeralDecimalMark: ',',
                   delimiter: '.'
                 },
+                loading_post:false,
+                customer_name:'',
+                customer_tel:''
         };
     },
 
@@ -188,6 +198,79 @@ export default {
     },
 
     methods: {
+        async openLink(link) {
+            
+            const response = await fetch(`${link}`, {
+                headers: {
+                'Authorization': `Bearer ${this.store.get_token}`
+                }
+            });
+
+            const html = await response.text();
+            const blob = new Blob([html], { type: 'text/html' });
+            const blobUrl = URL.createObjectURL(blob);
+            window.open(blobUrl, '_blank');
+
+            },
+       async Pay(){
+        this.loading_post = true
+
+            await axios.post("transection/add",{
+                acc_type:'income',
+                listorder:this.ListOrder,
+                customer_name: this.customer_name,
+                customer_tel: this.customer_tel
+            },{ headers:{ "content-type":"multipart/form-data", Authorization: 'Bearer '+ this.store.get_token}}).then((response)=>{
+                  this.loading_post = false
+                 
+
+                        if(response.data.success){
+
+                        $('#ConfirmToPay').modal('hide')
+                        this.ListOrder = []
+                        this.customer_name = ''
+                        this.customer_tel = ''
+                        this.GetAllStore()
+
+                        this.openLink(window.location.origin+'/api/bills/print/'+response.data.bill_id)
+
+                        //   this.$swal({
+                        //     toast:true,
+                        //     position: 'top-end',
+                        //     icon: 'success',
+                        //     title: response.data.message,
+                        //     showConfirmButton: false,
+                        //     timer: 2500
+                        //   })
+
+                        } else {
+                          this.$swal({
+                            // toast:true,
+                            position: 'center',
+                            icon: 'error',
+                            title: 'ຜິດຜາດ!',
+                            text: response.data.message,
+                            showConfirmButton: false,
+                            timer: 4500
+                          })
+                        }
+
+                      }).catch((error)=>{
+                        this.loading_post = false
+                        console.log(error);
+                        // ກວດເຊັກຫາກບໍ່ມີການ ເຂົ້າສູ່ລະບົບ ໃຫ້ໄປໜ້າເຂົ້າສູ່ລະບົບ
+                        if(error){
+                            if(error.response.status == 401){
+                                useStore().remove_token()
+                                useStore().remove_user()
+                                localStorage.removeItem('web_token')
+                                localStorage.removeItem('web_user')
+                                this.$router.push("/login")
+                            }
+                        }
+
+                      })
+        },
         AddNum(num){
             if(num == '-'){ 
                 this.CashAmount = this.CashAmount.slice(0,-1)
