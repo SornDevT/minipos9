@@ -169,7 +169,7 @@ export default {
             ListOrder:[],
             search:'',
             list_page:20,
-            sort:'asc',
+            sort:'desc',
             options: {
                   // prefix: '₭ ',
                   numeral: true,
@@ -284,27 +284,44 @@ export default {
         AddProduct(id){
             // console.log(id);
 
-            let list_order = this.ListOrder.find((i)=>i.id==id)
+            let item = this.StoreData.data.find((i)=>i.id == id)
 
-            if(list_order){
-                // ອັບເດດຈຳນວນ
+            if(item.amount>0){ // ກວດຊອບຈຳນວນສິນຄ້າ ຖ້າຫຼາຍກ່ວາ 0
 
-                list_order.order_amount++
+                let list_order = this.ListOrder.find((i)=>i.id==id)
 
+                if(list_order){
+                    // ອັບເດດຈຳນວນ
+                    // console.log(list_order)
+
+                    let old_order = list_order.order_amount
+
+                    if((item.amount - old_order)>0){
+                        list_order.order_amount++
+                    } else {
+                        this.$swal('ສິນຄ້າ','ໝົດແລ້ວ','error');
+                    }
+
+                    
+
+
+                } else {
+                    // ເພີ່ມລາຍການໃໝ່
+                    // let item = this.StoreData.data.find((i)=>i.id==id)
+                    // console.log(item);
+                    this.ListOrder.push({
+                        id: item.id,
+                        name: item.name,
+                        order_amount: 1,
+                        price_sell: item.price_sell
+                    })
+                }
 
             } else {
-                // ເພີ່ມລາຍການໃໝ່
-                let item = this.StoreData.data.find((i)=>i.id==id)
-                // console.log(item);
-
-
-                this.ListOrder.push({
-                    id: item.id,
-                    name: item.name,
-                    order_amount: 1,
-                    price_sell: item.price_sell
-                })
+                this.$swal('ສິນຄ້າ','ໝົດແລ້ວ','error');
             }
+
+           
 
            
         },

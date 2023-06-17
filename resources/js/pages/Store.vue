@@ -349,8 +349,6 @@ export default {
                 /// ເພີ່ມຂໍ້ມູນໃໝ່
                 await axios.post("store/add",this.FormStore,{ headers:{ "content-type":"multipart/form-data", Authorization: 'Bearer '+ this.store.get_token}}).then((response)=>{
                   this.loading_post = false
-                 
-
                         if(response.data.success){
                           this.ShowForm = false
                           this.GetAllStore()

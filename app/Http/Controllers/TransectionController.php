@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Transection;
 use App\Models\Bill;
 use App\Models\BillList;
+use App\Models\Store;
 
 class TransectionController extends Controller
 {
@@ -16,19 +17,49 @@ class TransectionController extends Controller
     }
 
 
-    public function index(){
+    public function index(Request $request){
          try{
 
-                $search = \Request::get("search");
                 $sort = \Request::get("sort");
                 $lp = \Request::get("lp");
 
-                $store = Transection::orderBy("id",$sort)
-                ->where("name","LIKE","%{$search}%")
-                ->paginate($lp)
-                ->toArray();
+                $month_type = $request->month_type;
+                $dmy = $request->dmy;
 
-                return array_reverse($store);
+                if($dmy == ''){
+
+                    $tran = Transection::orderBy("id",$sort)
+                    ->paginate($lp)
+                    ->toArray();
+                    return array_reverse($tran);
+
+                } else {
+
+                    $m = explode("-",$dmy)[1];
+                    $y = explode("-",$dmy)[0];
+
+                    if($month_type == 'm'){
+
+                        $tran = Transection::orderBy("id",$sort)
+                        ->whereYear("created_at","=",$y)
+                        ->whereMonth("created_at","=",$m)
+                        ->paginate($lp)
+                        ->toArray();
+                        return array_reverse($tran);
+
+                    } else if($month_type == 'y'){
+
+                        $tran = Transection::orderBy("id",$sort)
+                        ->whereYear("created_at","=",$y)
+                        ->paginate($lp)
+                        ->toArray();
+                        return array_reverse($tran);
+
+                    }
+
+                }
+
+                
 
                 $success = true;
                 $message = "ສຳເລັດ!";
@@ -78,10 +109,6 @@ class TransectionController extends Controller
             $bill->save();
 
             /// ຈົບການບັນທຶກ ຂໍ້ມູນໃບບິນ
-
-
-
-
          
                 foreach($request->listorder as $item ){
 
@@ -129,6 +156,16 @@ class TransectionController extends Controller
                         'price' => $item['price_sell'],
                     ]);
                     $bill_list->save();
+
+                    /// ອັບເເດ ຕັດທີ
+
+                    $store = Store::find($item['id']);
+
+                    $store_update = Store::find($item['id']);
+                    $store_update->update([
+                        'amount' => $store->amount - $item['order_amount'],
+                    ]);
+
                 }
 
                     $success = true;
