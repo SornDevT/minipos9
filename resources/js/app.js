@@ -15,12 +15,15 @@ import Cleave from 'vue-cleave-component'
 import { createPinia } from 'pinia'
 const pinia = createPinia()
 
+import GrapBoard from './components/GrapBoard.vue'
+
 
 const app = createApp(App)
 app.use(VueSweetalert2)
 app.use(Cleave)
 app.use(router)
 app.use(pinia)
+app.component("GrapBoard",GrapBoard)
 app.component("SildeBarMenu",Menu)
 app.component("pagination",Pagination)
 app.mount("#app-vue")

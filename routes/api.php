@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\TransectionController;
 use App\Http\Controllers\BillsController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,4 +48,9 @@ Route::controller(TransectionController::class)->group(function (){
 
 Route::controller(BillsController::class)->group(function (){
     Route::get('bills/print/{id}','print');
+});
+
+Route::controller(ReportController::class)->group(function (){ 
+    Route::post('report','create_report');
+    Route::get('report/grapboard','create_grapboard');
 });
