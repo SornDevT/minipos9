@@ -15,7 +15,7 @@
                             <div class="num-img" v-if="list.id == i.id">{{ i.order_amount }}</div>
                         </span>
                         <img v-if="list.image" :src="'/assets/img/'+list.image" class=" card-img-top img-cover" alt="">
-                        <img v-else src="/assets/img/add-img.png" class=" card-img-top img-cover" alt="">
+                        <img v-else :src="url+ '/assets/img/add-img.png'" class=" card-img-top img-cover" alt="">
                         <div class="card-body p-1 text-center">
                             {{list.name}}
                             <p class="card-text">{{formatPrice(list.price_sell)}} ກີບ</p>
@@ -164,6 +164,7 @@ export default {
     },
     data() {
         return {
+            url: window.location.origin,
             CashAmount:'',
             StoreData:[],
             ListOrder:[],

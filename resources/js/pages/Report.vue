@@ -116,13 +116,13 @@ export default {
     },
     computed:{
         sum_income(){
-            return this.data_income.reduce((num,item)=> num + item.price,0)
+            return this.data_income.reduce((num,item)=> parseInt(num) + parseInt(item.price),0)
         },
         sum_expense(){
-            return this.data_expense.reduce((num,item)=> num + item.price,0)
+            return this.data_expense.reduce((num,item)=> parseInt(num) + parseInt(item.price),0)
         },
         sum_profit(){
-            return this.sum_income-this.sum_expense
+            return parseInt(this.sum_income)-parseInt(this.sum_expense)
         }
     },
 

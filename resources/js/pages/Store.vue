@@ -92,7 +92,7 @@
           <tr v-for="list in StoreData.data" :key="list.id">
             <td> {{ list.id  }} </td>
             <td> <img :src="'/assets/img/'+list.image" class="w-100 rounded" alt="" v-if="list.image"> 
-               <img src="/assets/img/add-img.png" class="w-100 rounded" alt="" v-else>
+               <img :src="url+ '/assets/img/add-img.png'" class="w-100 rounded" alt="" v-else>
                </td>
             <td> {{ list.name  }} </td>
             <td> {{ formatPrice(list.price_buy) }}</td>
@@ -155,7 +155,8 @@ export default {
                   numeralDecimalMark: ',',
                   delimiter: '.'
                 },
-          image_pre: window.location.origin+'/assets/img/add-img.png'
+          image_pre: window.location.origin+'/assets/img/add-img.png',
+          url: window.location.origin
         };
     },
 
@@ -221,7 +222,8 @@ export default {
             this.FormStore.amount = ''
             this.FormStore.price_buy = ''
             this.FormStore.price_sell = ''
-
+            this.FormStore.image = ''
+            this.image_pre = window.location.origin+'/assets/img/add-img.png'
             this.ShowForm = true
         },
         CancelStore(){
